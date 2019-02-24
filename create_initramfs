@@ -1,6 +1,6 @@
 create_initramfs()
 {
-#!/bin/sh
+#!/bin/bash
 
 sudo mkinitramfs -o /boot/init.gz
 
