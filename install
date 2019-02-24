@@ -1,0 +1,7 @@
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/create_initramfs)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/disable_swap)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/create_roscript)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/create_rwscript)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/create_overlay)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/create_hooks)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/update_initramfs)
