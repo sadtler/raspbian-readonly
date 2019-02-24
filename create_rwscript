@@ -1,3 +1,4 @@
+#!/bin/bash
 rw_script()
 {
 sudo bash -c 'cat > /home/pi/rw-mode' << 'EOL'
