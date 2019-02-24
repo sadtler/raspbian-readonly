@@ -1,4 +1,4 @@
-# raspbian-ro
+# raspbian-readonly
 
 Credit goes to the following people
 - [niun](https://gist.github.com/niun/34c945d70753fc9e2cc7)
