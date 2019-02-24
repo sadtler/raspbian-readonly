@@ -1,4 +1,4 @@
-overlay_fs()
+create_overlay()
 {
 sudo bash -c 'cat > /etc/initramfs-tools/scripts/init-bottom/root-ro' << 'EOL'
 #!/bin/bash
@@ -166,4 +166,4 @@ exit 0
 EOL
 sudo chmod +x /etc/initramfs-tools/scripts/init-bottom/root-ro
 }
-echo creating overlayfs ; overlay_fs
+echo creating overlayfs ; create_overlay
