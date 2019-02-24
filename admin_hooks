@@ -1,0 +1,15 @@
+create_hooks()
+{
+sudo bash -c 'cat > /etc/initramfs-tools/hooks/root-ro' << 'EOL'
+#!/bin/bash
+
+. /usr/share/initramfs-tools/scripts/functions
+. /usr/share/initramfs-tools/hook-functions
+
+copy_exec /sbin/fsck
+copy_exec /sbin/fsck.ext4
+copy_exec /sbin/fsck.vfat
+EOL
+sudo chmod +x /etc/initramfs-tools/hooks/root-ro
+}
+echo creating hooks ; create_hooks
