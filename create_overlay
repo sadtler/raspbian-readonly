@@ -1,3 +1,4 @@
+#!/bin/bash
 create_overlay()
 {
 sudo bash -c 'cat > /etc/initramfs-tools/scripts/init-bottom/root-ro' << 'EOL'
