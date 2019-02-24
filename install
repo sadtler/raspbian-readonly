@@ -6,4 +6,5 @@ bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristo
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-readonly/master/create_overlay)
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-readonly/master/create_hooks)
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-readonly/master/update_initramfs)
+echo restarting
 sudo reboot
