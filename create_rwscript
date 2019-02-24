@@ -4,9 +4,9 @@ rw_script()
 sudo bash -c 'cat > /home/pi/rw-mode' << 'EOL'
 #!/bin/bash
 
-mount -o remount,rw /mnt/root-ro
-touch /mnt/root-ro/disable-root-ro
-reboot
+sudo mount -o remount,rw /mnt/root-ro
+sudo touch /mnt/root-ro/disable-root-ro
+sudo reboot
 EOL
 sudo chmod +x /home/pi/rw-mode
 }
