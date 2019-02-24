@@ -24,3 +24,13 @@ Everything will be set up, and after reboot the system will be read-only.
 ```
 /home/pi/ro-mode
 ```
+**Temporary write access mode**
+```
+sudo mount -o remount,rw /mnt/root-ro
+chroot /mnt/root-ro
+```
+**Exit temporary write access mode**
+```
+exit
+sudo mount -o remount,ro /mnt/root-ro
+```
