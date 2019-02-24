@@ -1,0 +1,17 @@
+create_initramfs()
+{
+#!/bin/sh
+
+sudo mkinitramfs -o /boot/init.gz
+
+if ! grep -q "^initramfs " /boot/config.txt; then
+  echo adding initramfs init.gz to /boot/config.txt
+  echo initramfs init.gz | sudo tee -a /boot/config.txt
+fi
+
+if ! grep -q "^overlay" /etc/initramfs-tools/modules; then
+  echo adding overlay to /etc/initramfs-tools/modules
+  echo overlay | sudo tee -a /etc/initramfs-tools/modules
+fi
+}
+echo creating initramfs ; create_initramfs
