@@ -1,0 +1,169 @@
+overlay_fs()
+{
+sudo bash -c 'cat > /etc/initramfs-tools/scripts/init-bottom/root-ro' << 'EOL'
+#!/bin/bash
+
+# Read-only Root-FS with overlayfs for Raspian
+# Credits to niun/root-ro (https://gist.github.com/niun/34c945d70753fc9e2cc7)
+
+PREREQ=""
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /scripts/functions
+
+MYTAG="root-ro"
+DISABLE_MAGIC_FILE="/disable-root-ro"
+
+ROOT_RO_DRIVER=
+DISABLE_ROOT_RO=
+for CMD_PARAM in $(cat /proc/cmdline); do
+    case ${CMD_PARAM} in
+        disable-root-ro=*)
+            DISABLE_ROOT_RO=${CMD_PARAM#disable-root-ro=}
+            ;;
+        root-ro-driver=*)
+            ROOT_RO_DRIVER=${CMD_PARAM#root-ro-driver=}
+            ;;
+    esac
+done
+
+# check if read-only root fs is disabled
+if [ ! -z "${DISABLE_ROOT_RO}" ]; then
+    log_warning_msg "${MYTAG}: disabled, found boot parameter disable-root-ro=${DISABLE_ROOT_RO}"
+    exit 0
+fi
+if [ -e "${rootmnt}${DISABLE_MAGIC_FILE}" ]; then
+    log_warning_msg "${MYTAG}: disabled, found file ${rootmnt}${DISABLE_MAGIC_FILE}"
+    exit 0
+fi
+
+ROOT_RO=/mnt/root-ro
+ROOT_RW=/mnt/root-rw
+ROOT_RW_UPPER=${ROOT_RW}/upper
+ROOT_RW_WORK=${ROOT_RW}/work
+
+if [ -z "${ROOT_RO_DRIVER}" ]; then
+    ROOT_RO_DRIVER=overlay
+fi
+
+case ${ROOT_RO_DRIVER} in
+    overlay)
+        MOUNT_PARMS="-t overlay -o lowerdir=${ROOT_RO},upperdir=${ROOT_RW_UPPER},workdir=${ROOT_RW_WORK} overlay ${rootmnt}"
+        ;;
+    aufs)
+        MOUNT_PARMS="-t aufs -o dirs=${ROOT_RW}:${ROOT_RO}=ro aufs-root ${rootmnt}"
+        ;;
+    *)
+        panic "${MYTAG} ERROR 1: invalid ROOT_RO_DRIVER ${ROOT_RO_DRIVER}"
+        ;;
+esac
+
+modprobe -qb ${ROOT_RO_DRIVER}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 2: missing kernel module ${ROOT_RO_DRIVER}"
+    exit 0
+fi
+
+[ -d ${ROOT_RW} ] || mkdir -p ${ROOT_RW}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 3: failed to create ${ROOT_RW}"
+    exit 0
+fi
+
+[ -d ${ROOT_RO} ] || mkdir -p ${ROOT_RO}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 4: failed to create ${ROOT_RO}"
+    exit 0
+fi
+
+[ -d ${ROOT_WORKDIR} ] || mkdir -p ${ROOT_WORKDIR}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 5: failed to create ${ROOT_WORKDIR}"
+    exit 0
+fi
+
+mount -t tmpfs tmpfs-root ${ROOT_RW}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 6: failed to create tmpfs"
+    exit 0
+fi
+
+if [ "${ROOT_RO_DRIVER}" = "overlay" ]; then
+
+    [ -d ${ROOT_RW_UPPER} ] || mkdir -p ${ROOT_RW_UPPER}
+    if [ $? -ne 0 ]; then
+        log_failure_msg "${MYTAG} ERROR 6.1: failed to create ${ROOT_RW_UPPER}"
+        exit 0
+    fi
+
+    [ -d ${ROOT_RW_WORK} ] || mkdir -p ${ROOT_RW_WORK}
+    if [ $? -ne 0 ]; then
+        log_failure_msg "${MYTAG} ERROR 6.2: failed to create ${ROOT_RW_WORK}"
+        exit 0
+    fi
+
+fi
+
+mount -o move ${rootmnt} ${ROOT_RO}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 7: failed to move root away from ${rootmnt} to ${ROOT_RO}"
+    exit 0
+fi
+
+mount ${MOUNT_PARMS}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 8: failed to create new ro/rw layerd ${rootmnt}"
+    mount -o move ${ROOT_RO} ${rootmnt}
+    if [ $? -ne 0 ]; then
+       panic "${MYTAG} RECOVERY ERROR: failed to move ${ROOT_RO} back to ${rootmnt}"
+    fi
+    exit 0
+fi
+
+[ -d ${rootmnt}${ROOT_RO} ] || mkdir -p ${rootmnt}${ROOT_RO}
+mount -o move ${ROOT_RO} ${rootmnt}${ROOT_RO}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 9: failed to move ${ROOT_RO} to ${rootmnt}${ROOT_RO}"
+    exit 0
+fi
+
+[ -d ${rootmnt}${ROOT_RW} ] || mkdir -p ${rootmnt}${ROOT_RW}
+mount -o move ${ROOT_RW} ${rootmnt}${ROOT_RW}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG}: ERROR 10: failed to move ${ROOT_RW} to ${rootmnt}${ROOT_RW}"
+    exit 0
+fi
+
+ROOT_TYPE=$(cat /proc/mounts | ${rootmnt}/bin/grep ${ROOT} | ${rootmnt}/usr/bin/cut -d' ' -f3)
+ROOT_OPTIONS=$(cat /proc/mounts | ${rootmnt}/bin/grep ${ROOT} | ${rootmnt}/usr/bin/cut -d' ' -f4)
+cat <<EOF >${rootmnt}/etc/fstab
+
+${ROOT} ${ROOT_RO} ${ROOT_TYPE} ${ROOT_OPTIONS} 0 0
+
+EOF
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 11: failed to modify /etc/fstab (step 1)"
+fi
+
+cat ${rootmnt}${ROOT_RO}/etc/fstab | ${rootmnt}/bin/grep -v ' / ' | ${rootmnt}/bin/grep -v swap >>${rootmnt}/etc/fstab
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR 12: failed to modify etc/fstab (step 2)"
+fi
+
+log_success_msg "${MYTAG} sucessfully set up ro/tmpfs-rw layered root fs using ${ROOT_RO_DRIVER}"
+
+exit 0
+EOL
+sudo chmod +x /etc/initramfs-tools/scripts/init-bottom/root-ro
+}
+echo creating overlayfs ; overlay_fs
