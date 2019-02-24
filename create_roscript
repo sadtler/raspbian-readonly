@@ -1,3 +1,4 @@
+#!/bin/bash
 ro_script()
 {
 sudo bash -c 'cat > /home/pi/ro-mode' << 'EOL'
