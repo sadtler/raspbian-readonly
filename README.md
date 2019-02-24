@@ -18,9 +18,9 @@ Everything will be set up, and after reboot the system will be read-only.
 
 **Reboot to write-mode (disable overlay fs)**
 ```
-/home/pi/rw-mode
+./rw-mode
 ```
 **Reboot to read-only mode (enable overlay fs)**
 ```
-/home/pi/ro-mode
+./ro-mode
 ```
