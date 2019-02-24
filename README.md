@@ -6,7 +6,7 @@ Credit goes to the following people
 - [JasperE84](https://github.com/JasperE84/root-ro)
 - [josepsanzcamp](https://github.com/josepsanzcamp/root-ro)
 
-They did the actual work, I simply modularized the scripts for my own convenience, configured them so the pi user can run them (no need to become root) and created a single command installation.
+They did the actual work, I simply modularized the scripts for my own convenience, configured them so the pi user can run them (no need to sudo su) and created a single command installation.
 
 Run the command below on a clean, minimal installation of Raspbian Stretch.
 
