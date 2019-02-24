@@ -1,10 +1,10 @@
+#!/bin/bash
+
 disable_swap()
 {
-#!/bin/sh
-
-sudo dphys-swapfile swapoff
-sudo dphys-swapfile uninstall
-sudo update-rc.d dphys-swapfile disable
-sudo /lib/systemd/systemd-sysv-install disable dphys-swapfile
+ sudo dphys-swapfile swapoff
+ sudo dphys-swapfile uninstall
+ sudo update-rc.d dphys-swapfile disable
+ sudo /lib/systemd/systemd-sysv-install disable dphys-swapfile
 }
 echo disabling swap ; disable_swap
