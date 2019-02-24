@@ -1,0 +1,13 @@
+update_initramfs()
+{
+#!/bin/sh
+
+sudo update-initramfs -u
+sudo mkinitramfs -o /boot/init.gz
+
+if ! grep -q "root-ro-driver=overlay" /boot/cmdline.txt; then
+  echo adding root-ro-driver parameter to /boot/cmdline.txt
+  sudo sed -i "1 s|$| root-ro-driver=overlay|" /boot/cmdline.txt
+fi
+}
+echo updating initramfs ; update_initramfs
