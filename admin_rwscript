@@ -1,0 +1,12 @@
+rw_script()
+{
+sudo bash -c 'cat > /home/pi/rw-mode' << 'EOL'
+#!/bin/bash
+
+mount -o remount,rw /mnt/root-ro
+touch /mnt/root-ro/disable-root-ro
+reboot
+EOL
+sudo chmod +x /home/pi/rw-mode
+}
+echo creating rw script ; rw_script
