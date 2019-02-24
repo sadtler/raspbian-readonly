@@ -1,0 +1,11 @@
+ro_script()
+{
+sudo bash -c 'cat > /home/pi/ro-mode' << 'EOL'
+#!/bin/bash
+
+rm /disable-root-ro
+reboot
+EOL
+sudo chmod +x /home/pi/ro-mode
+}
+echo creating ro script ; ro_script
