@@ -1,3 +1,4 @@
+#!/bin/bash
 create_hooks()
 {
 sudo bash -c 'cat > /etc/initramfs-tools/hooks/root-ro' << 'EOL'
