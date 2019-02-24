@@ -4,8 +4,8 @@ ro_script()
 sudo bash -c 'cat > /home/pi/ro-mode' << 'EOL'
 #!/bin/bash
 
-rm /disable-root-ro
-reboot
+sudo rm /disable-root-ro
+sudo reboot
 EOL
 sudo chmod +x /home/pi/ro-mode
 }
