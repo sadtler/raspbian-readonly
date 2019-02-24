@@ -11,7 +11,7 @@ They did the actual work, I simply modularized the scripts for my own convenienc
 Run the command below on a clean, minimal installation of Raspbian Stretch.
 
 ```
-bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-ro/master/install)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristosv/raspbian-readonly/master/install)
 ```
 
 Everything will be set up, and after reboot the system will be read-only.
