@@ -16,7 +16,7 @@ bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/aristo
 
 Everything will be set up, and after reboot the system will be read-only.
 
-**Reboot to write-mode (disable overlay fs)**
+**Reboot to read/write mode (disable overlay fs)**
 ```
 /home/pi/rw-mode
 ```
@@ -24,7 +24,7 @@ Everything will be set up, and after reboot the system will be read-only.
 ```
 /home/pi/ro-mode
 ```
-**Temporary write access mode**
+**Enter temporary write access mode**
 ```
 sudo mount -o remount,rw /mnt/root-ro
 chroot /mnt/root-ro
